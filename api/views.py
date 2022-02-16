@@ -10,7 +10,12 @@ from .models import Musics, PlayList
 from .serializers import MusicSerializer, MusicBodySerializer, MusicQuerySerializer, \
     PlayListSerializer, PlayListQuerySerializer, PlayListBodySerializer
 
+music_list_response = openapi.Response('', MusicSerializer(many=True))
+
+
+
 class MusicListView(APIView):
+    @swagger_auto_schema(responses={200: music_list_response})
     def get(self, request):
         serializer = MusicSerializer(Musics.objects.all(), many=True)
 
