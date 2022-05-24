@@ -10,13 +10,21 @@ class MusicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Musics
         fields = '__all__'  # 모든 필드 사용
-        # fields = ('id', 'created_at', 'title', 'category', 'star_rating',)  # 응답 필드 지정
+        # fields = ('id', 'created_at', 'title', 'category', 'star_rating',)  # 특정 필드 지정
 
 class MusicBodySerializer(serializers.Serializer):
     singer = serializers.CharField(help_text="가수명")
     title = serializers.CharField(help_text="곡 제목")
     category = serializers.ChoiceField(help_text="곡 범주", choices=('KPOP', 'POP', 'CLASSIC', 'ETC'))
     star_rating = serializers.ChoiceField(help_text="1~3 이내 지정 가능. 숫자가 클수록 좋아하는 곡", choices=(1, 2, 3), required=False)
+
+    class Meta:
+        examples = {
+            "singer": "tester",
+            "title": "title_test",
+            "category": "KPOP",
+            "star_rating": "1",
+        }
 
 class MusicQuerySerializer(serializers.Serializer):
     title = serializers.CharField(help_text="곡 제목으로 검색", required=False)
@@ -32,7 +40,6 @@ class MusicForPlayListSerializer(serializers.ModelSerializer):
         
 class PlayListSerializer(serializers.ModelSerializer):
     music = MusicForPlayListSerializer(read_only=True)
-    # music = MusicSerializer(read_only=True)  # Music 모든 필드 조회
 
     class Meta:
         model = PlayList
@@ -41,7 +48,18 @@ class PlayListSerializer(serializers.ModelSerializer):
 class PlayListQuerySerializer(serializers.Serializer):
     title = serializers.CharField(help_text="곡 제목 검색", required=False)
     singer = serializers.CharField(help_text="가수 이름 검색", required=False)
-    
+
+    class Meta:
+        examples = {
+            "title": "title_test",
+            "singer": "test",
+        }
+
 class PlayListBodySerializer(serializers.Serializer):
     name = serializers.CharField(help_text="플레이 리스트 이름")
     playlist = MusicBodySerializer(read_only=True)
+
+    class Meta:
+        examples = {
+            "name": "playlist1",
+        }
