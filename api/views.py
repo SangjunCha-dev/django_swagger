@@ -17,24 +17,23 @@ music_list_response = openapi.Response('', MusicSerializer(many=True))
 class MusicListView(APIView):
     @swagger_auto_schema(responses={200: music_list_response})
     def get(self, request):
+        '''
+        음악 목록 조회
+
+        ---
+        '''
         serializer = MusicSerializer(Musics.objects.all(), many=True)
 
         response = Response(data=serializer.data)
         return response
 
-    @swagger_auto_schema(request_body=MusicBodySerializer)  # Request Serializer 지정
+    @swagger_auto_schema(request_body=MusicBodySerializer)
     def post(self, request):
-        # 중복 검사 없이 추가
-        # serializer = MusicSerializer(data=request.data)
-        
-        # if not serializer.is_valid(raise_exception=False):
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+        '''
+        음악 추가
 
-        # serializer.save()
-        # response = Response(data=serializer.validated_data, status=status.HTTP_201_CREATED)
-        # return response
-        
-        # 중복 검사 후 추가
+        ---
+        '''
         musics = Musics.objects.filter(**request.data)
         if musics.exists():
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -52,13 +51,19 @@ class MusicListView(APIView):
 class SearchMusicListView(APIView):
     @swagger_auto_schema(query_serializer=MusicQuerySerializer)
     def get(self, request):
-        # filter 조건문 생성
+        '''
+        음악 검색
+
+        ---
+        '''
+        query_string = request.GET
+
         conditions = {
-            'title__contains': request.GET.get('title', None),
-            'star_rating': request.GET.get('star_rating', None),
-            'singer__contains': request.GET.get('singer', None),
-            'category': request.GET.get('category', None),
-            'created_at__lte': request.GET.get('created_at', None),
+            'title__contains': query_string.get('title', None),
+            'star_rating': query_string.get('star_rating', None),
+            'singer__contains': query_string.get('singer', None),
+            'category': query_string.get('category', None),
+            'created_at__lte': query_string.get('created_at', None),
         }
         conditions = {
             key: val for key, val in conditions.items() if val is not None
@@ -75,6 +80,11 @@ class MusicView(APIView):
         return get_object_or_404(Musics, pk=pk)
 
     def get(self, request, pk):
+        '''
+        음악 정보 조회
+
+        ---
+        '''
         serializer = MusicSerializer(Musics.objects.filter(id=pk), many=True)
 
         response = Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -90,6 +100,11 @@ class MusicView(APIView):
         )],
     )
     def put(self, request, pk):
+        '''
+        음악 정보 수정
+
+        ---
+        '''
         object = self.get_object(pk=pk)
         serializer = MusicSerializer(object, data=request.data)
 
@@ -101,6 +116,11 @@ class MusicView(APIView):
         return response
 
     def delete(self, request, pk):
+        '''
+        음악 정보 삭제
+
+        ---
+        '''
         object = self.get_object(pk=pk)
         object.delete()
 
@@ -111,10 +131,16 @@ class MusicView(APIView):
 class PlayListView(APIView):
     @swagger_auto_schema(query_serializer=PlayListQuerySerializer)
     def get(self, request):
-        # filter 조건문 생성
+        '''
+        재생 목록 조회
+
+        ---
+        '''
+        query_string = request.GET
+
         conditions = {
-            'music__title__contains': request.GET.get('title', None),
-            'music__singer__contains': request.GET.get('singer', None),
+            'music__title__contains': query_string.get('title', None),
+            'music__singer__contains': query_string.get('singer', None),
         }
         conditions = {
             key: val for key, val in conditions.items() if val is not None
@@ -128,10 +154,15 @@ class PlayListView(APIView):
 
     @swagger_auto_schema(request_body=PlayListBodySerializer)
     def post(self, request):
-        conditions = request.data['playlist']
+        '''
+        재생 목록 추가
+
+        ---
+        '''
+        conditions = request.data.get('playlist')
         music = Musics.objects.get(**conditions)
         playlist = PlayList.objects.create(
-            playlist_name=request.data['name'],
+            playlist_name=request.data.get('name'),
             music=music,  # model instance 또는 pk
         )
         playlist.save()
@@ -143,10 +174,17 @@ class PlayListView(APIView):
 class SearchPlayListView(APIView):
     @swagger_auto_schema(query_serializer=PlayListQuerySerializer)
     def get(self, request, playlist_name):
+        '''
+        재생 목록 검색
+
+        ---
+        '''
+        query_string = request.GET
+
         conditions = {
             'playlist_name': playlist_name,
-            'music__title__contains': request.GET.get('title', None),
-            'music__singer__contains': request.GET.get('singer', None),
+            'music__title__contains': query_string.get('title', None),
+            'music__singer__contains': query_string.get('singer', None),
         }
         conditions = {
             key: val for key, val in conditions.items() if val is not None
