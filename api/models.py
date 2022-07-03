@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 
 class Musics(models.Model):
     ONE_STAR = 1
@@ -26,7 +25,13 @@ class Musics(models.Model):
     singer = models.CharField(null=False, max_length=128, verbose_name='가수명')
     title = models.CharField(null=False, max_length=128, verbose_name='곡명')
     category = models.CharField(blank=True, null=True, max_length=32, choices=CATEGORY, verbose_name='범주')
-    star_rating = models.PositiveSmallIntegerField(blank=True, null=True, choices=STARS, default=ONE_STAR, verbose_name='곡 선호도')
+    star_rating = models.PositiveSmallIntegerField(
+        blank=True, 
+        null=True, 
+        choices=STARS, 
+        default=ONE_STAR, 
+        verbose_name='곡 선호도'
+    )
 
     class Meta:
         # abstract = True  # sqlite3 사용 시 주석
@@ -42,7 +47,13 @@ class PlayList(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='생성 날짜')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='업데이트 날짜')
     playlist_name = models.CharField(null=False, max_length=128, verbose_name='플레이리스트 이름')
-    music = models.ForeignKey(Musics, related_name='music', db_column='music_id', on_delete=models.CASCADE, verbose_name='곡')
+    music = models.ForeignKey(
+        Musics, 
+        related_name='music', 
+        db_column='music_id', 
+        on_delete=models.CASCADE, 
+        verbose_name='곡'
+    )
 
     class Meta:
         managed = True

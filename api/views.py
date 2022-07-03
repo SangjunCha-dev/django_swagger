@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response 
@@ -11,7 +10,6 @@ from .serializers import MusicSerializer, MusicBodySerializer, MusicQuerySeriali
     PlayListSerializer, PlayListQuerySerializer, PlayListBodySerializer
 
 music_list_response = openapi.Response('', MusicSerializer(many=True))
-
 
 
 class MusicListView(APIView):
@@ -91,12 +89,12 @@ class MusicView(APIView):
         return response
 
     @swagger_auto_schema(
-        request_body=MusicBodySerializer,  # Request Serializer 지정
+        request_body=MusicBodySerializer,       # Request Serializer 지정
         manual_parameters=[openapi.Parameter(
-            name='header_test',  # api 파라미터 이름
-            in_=openapi.IN_HEADER,  # 파라미터 종류 (header = openapi.IN_HEADER)
-            description="a header for test",  # 파라미터 설명
-            type=openapi.TYPE_STRING  # header 지정시 필수 선언
+            name='header_test',                 # api 파라미터 이름
+            in_=openapi.IN_HEADER,              # 파라미터 종류 (header = openapi.IN_HEADER)
+            description="a header for test",    # 파라미터 설명
+            type=openapi.TYPE_STRING            # header 지정시 필수 선언
         )],
     )
     def put(self, request, pk):
